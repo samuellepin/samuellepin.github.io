@@ -1,24 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le site de Samuel</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        h1 {
-            color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le site de Samuel</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Bonjour et bienvenue sur mon site ! 👋</h1>
-    <p>Je m'appelle Samuel et voici ma toute première page web !</p>
+
+  <!-- ========================================================
+       ÉCRAN PRINCIPAL : le piège
+       Tout ce bloc est centré verticalement/horizontalement
+       via flexbox dans le CSS.
+  ======================================================== -->
+  <div class="scene" id="scene">
+
+    <!-- Texte d'instruction affiché en haut -->
+    <p class="instruction" id="instruction">
+      Pour commencer l'aventure, appuie sur le bouton.
+    </p>
+
+    <!-- Sous-titre moqueur, mis à jour dynamiquement par JS -->
+    <p class="sub" id="sub">C'est simple, non ?</p>
+
+    <!-- Message troll qui apparaît quand on s'approche -->
+    <p class="taunt" id="taunt"></p>
+
+    <!-- LE bouton. Position: absolute pour pouvoir le déplacer librement
+         dans la scène avec left/top via JS. -->
+    <button class="troll-btn" id="troll-btn">
+      Commencer l'aventure
+    </button>
+
+    <!-- Barre de progression en bas (se vide sur 30s) -->
+    <div class="timer-wrap">
+      <span class="timer-label">encore <span id="countdown">30</span>s...</span>
+      <div class="timer-bar-bg">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+    </div>
+
+  </div>
+  <!-- fin .scene -->
+
+
+  <!-- ========================================================
+       ÉCRAN DE VICTOIRE : s'affiche après le clic final
+       Caché par défaut (display:none dans CSS),
+       affiché par JS quand le joueur clique après les 30s.
+  ======================================================== -->
+  <div class="victory" id="victory">
+    <h1>Bon... t'as de la chance.</h1>
+    <p>Le jeu de piste commence maintenant.</p>
+
+    <!-- Ce bouton redirige vers la première étape du jeu de piste.
+         Pour l'instant il recharge juste la page. -->
+    <a href="game/etape1.html" class="btn-start">
+      Commencer le vrai jeu →
+    </a>
+  </div>
+  <!-- fin .victory -->
+
+
+  <!-- Le script est chargé EN FIN de body pour que le DOM
+       soit déjà construit quand le JS s'exécute. -->
+  <script src="js/troll.js"></script>
+
 </body>
 </html>

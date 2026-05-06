@@ -1,0 +1,260 @@
+/* ============================================================
+   style.css — styles de la page d'accueil troll
+   Structure :
+     1. Reset & variables
+     2. Body / layout global
+     3. Scène (zone de jeu)
+     4. Textes (instruction, sub, taunt)
+     5. Le bouton troll
+     6. Barre de timer
+     7. Écran de victoire
+     8. Responsive mobile
+============================================================ */
+
+
+/* ------------------------------------------------------------
+   1. Reset & variables CSS
+   On définit ici les couleurs/polices pour pouvoir les
+   changer facilement en un seul endroit.
+------------------------------------------------------------ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:           #f4f4f9;       /* fond de page */
+  --surface:      #ffffff;       /* fond des éléments */
+  --text:         #1a1a2e;       /* texte principal */
+  --text-muted:   #6b6b80;       /* texte secondaire */
+  --text-danger:  #c0392b;       /* messages troll */
+  --accent:       #0056b3;       /* couleur du bouton / titres */
+  --accent-hover: #003f82;
+  --timer-color:  #e74c3c;       /* rouge pour la barre de compte à rebours */
+  --radius:       10px;
+  --font:         'Arial', sans-serif;
+}
+
+
+/* ------------------------------------------------------------
+   2. Body / layout global
+   On centre tout verticalement et horizontalement.
+------------------------------------------------------------ */
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* pas de scrollbar pendant le troll */
+}
+
+
+/* ------------------------------------------------------------
+   3. Scène (la zone où le bouton se balade)
+   position: relative est OBLIGATOIRE pour que le bouton
+   en position: absolute soit positionné par rapport à elle.
+------------------------------------------------------------ */
+.scene {
+  position: relative;          /* référence pour le bouton en absolute */
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Quand la scène est "terminée", on la cache avec une transition */
+.scene.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+
+/* ------------------------------------------------------------
+   4. Textes
+------------------------------------------------------------ */
+.instruction {
+  margin-top: 80px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--accent);
+  text-align: center;
+  padding: 0 2rem;
+  max-width: 600px;
+}
+
+.sub {
+  margin-top: 12px;
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Message moqueur : par défaut invisible,
+   le JS le remplit et l'affiche brièvement */
+.taunt {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-danger);
+  text-align: center;
+  min-height: 22px;           /* évite le saut de layout quand vide */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.taunt.visible {
+  opacity: 1;
+}
+
+
+/* ------------------------------------------------------------
+   5. Le bouton troll
+   position: absolute → le JS contrôle left/top librement.
+   On lui enlève la transition par défaut pour que le
+   déplacement soit instantané (effet de fuite réactif).
+   La transition est RE-ajoutée par JS pour l'animation
+   finale de centrage.
+------------------------------------------------------------ */
+.troll-btn {
+  position: absolute;          /* positionné par JS via left/top */
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--surface);
+  background-color: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  z-index: 10;
+  /* Pas de transition ici : la fuite doit être instantanée.
+     Le JS ajoute une transition CSS uniquement pour l'animation finale. */
+}
+
+.troll-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* État "apprivoisé" : ajouté par JS après les 30s */
+.troll-btn.tamed {
+  transition: left 0.6s ease, top 0.6s ease;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: 0 0 0 0 rgba(0, 86, 179, 0.4); }
+  to   { box-shadow: 0 0 0 12px rgba(0, 86, 179, 0); }
+}
+
+
+/* ------------------------------------------------------------
+   6. Barre de timer
+   Positionnée en bas de la scène.
+   La barre intérieure rétrécit via JS (width en %).
+------------------------------------------------------------ */
+.timer-wrap {
+  position: absolute;
+  bottom: 30px;
+  left: 10%;
+  right: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.timer-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timer-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;                 /* JS réduit ce width progressivement */
+  background: var(--timer-color);
+  border-radius: 99px;
+  /* Pas de transition CSS ici : le JS met à jour width
+     à chaque frame via requestAnimationFrame, c'est déjà fluide. */
+}
+
+
+/* ------------------------------------------------------------
+   7. Écran de victoire
+   Caché par défaut. Le JS lui retire la classe "hidden"
+   pour le rendre visible.
+------------------------------------------------------------ */
+.victory {
+  display: none;               /* caché au départ */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  padding: 2rem;
+  animation: fadeIn 0.6s ease;
+}
+
+/* Le JS fait : victory.style.display = 'flex' pour l'afficher */
+
+.victory h1 {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.victory p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.btn-start {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 14px 36px;
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-start:hover {
+  background: var(--accent-hover);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ------------------------------------------------------------
+   8. Responsive mobile
+   Sur mobile, les textes sont un peu plus petits.
+   Le comportement tactile est géré dans le JS (touchmove).
+------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .instruction {
+    font-size: 1.1rem;
+    margin-top: 60px;
+  }
+  .troll-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+}
